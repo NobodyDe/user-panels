@@ -1,16 +1,17 @@
+import DataTable from "./datatable/DataTable";
+import Header from "./layout/Header";
+import Title from "./layout/Title";
+
 function App() {
   return (
-    <main className="grid min-h-screen place-items-center bg-bg text-fg">
-      <div className="space-y-4 p-8 text-center">
-        <h1 className="text-4xl font-semibold tracking-tight">
-          user-panels
-        </h1>
-        <p className="text-muted">
-          Boilerplate React + TypeScript + Vite + Tailwind v4 + ESLint.
-        </p>
+    <main className="min-h-screen min-w-screen ">
+      <Header />
+      <div className="px-22 py-12">
+        <Title />
+        <DataTable />
       </div>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

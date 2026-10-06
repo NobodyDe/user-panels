@@ -10,17 +10,20 @@
 
 /* ---------- Design tokens (light) ---------- */
 @theme {
-  --color-bg: #ffffff;
-  --color-fg: #0a0a0a;
-  --color-muted: #6b7280;
-  --color-brand: #6366f1;
-  --color-brand-fg: #ffffff;
-  --color-border: #e5e7eb;
+  --color-bg: #0a0a0b;
+  --color-superface: #111113;
+  --color-muted: #18181b;
+  --color-brand: #3bff8a;
+  --color-text: #f4f4f5;
+  --color-text-foreground: #a1a1aa;
+  --color-error: #ff6b6b;
+  --color-brand-fg: #3bff8a;
+  --color-border: #2a2a2f;
 
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", Consolas,
-    monospace;
+  --font-sans:
+    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", Consolas, monospace;
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -28,16 +31,6 @@
 }
 
 /* ---------- Design tokens (dark, automático pelo SO) ---------- */
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-bg: #0a0a0a;
-    --color-fg: #f5f5f5;
-    --color-muted: #9ca3af;
-    --color-brand: #818cf8;
-    --color-brand-fg: #0a0a0a;
-    --color-border: #1f2937;
-  }
-}
 
 /* ---------- Base ---------- */
 *,
