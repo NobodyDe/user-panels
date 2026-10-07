@@ -1,5 +1,6 @@
 import { Users } from "lucide-react";
 import { Fragment } from "react/jsx-runtime";
+import Point from "../common/Point";
 
 const options = [
   { label: "Painel", style: "font-bold text-text " },
@@ -24,10 +25,7 @@ export default function Header() {
         </div>
 
         <div className="border border-border rounded-full flex gap-2 items-center p-2 px-4">
-          <span className="relative flex size-2.5">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-60" />
-            <span className="relative inline-flex size-2.5 rounded-full bg-brand shadow-[0_0_10px_var(--color-brand)]" />
-          </span>
+          <Point />
           <span className="text-text-foreground">API Falsa - 350ms</span>
         </div>
       </div>
