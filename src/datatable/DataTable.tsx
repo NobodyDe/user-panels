@@ -4,8 +4,13 @@ import { MoveVertical } from "lucide-react";
 import BadgeIcon from "./BadgeIcon";
 import Badge from "./Badge";
 import Active from "./Active";
+import type { User } from "../types/user";
 
-export default function DataTable() {
+type DataTableProps = {
+  users: User[];
+};
+
+export default function DataTable({ users }: DataTableProps) {
   return (
     <div>
       <header>

@@ -7,9 +7,9 @@ Guia de estudo para construir `listarUsuarios(params, signal?)` em `src/api/api.
 ## Sumário
 
 1. [O objetivo](#1-o-objetivo)
-2. [E o `fetch`?](#2-e-o-fetch)
-3. [Anatomia do `listarUsuarios`](#3-anatomia-do-listarusuarios)
-4. [De onde vem a busca: o `params`](#4-de-onde-vem-a-busca-o-params)
+2. [E o](#2-e-o-fetch) `fetch`[?](#2-e-o-fetch)
+3. [Anatomia do](#3-anatomia-do-listarusuarios) `listarUsuarios`
+4. [De onde vem a busca: o](#4-de-onde-vem-a-busca-o-params) `params`
 5. [Etapa A — filtrar](#5-etapa-a--filtrar)
 6. [Etapa B — ordenar](#6-etapa-b--ordenar)
 7. [Etapa C — fatiar](#7-etapa-c--fatiar)
@@ -20,6 +20,8 @@ Guia de estudo para construir `listarUsuarios(params, signal?)` em `src/api/api.
 12. [Checklist](#12-checklist)
 
 ---
+
+
 
 ## 1. O objetivo
 
@@ -33,6 +35,8 @@ Guia de estudo para construir `listarUsuarios(params, signal?)` em `src/api/api.
 
 ---
 
+
+
 ## 2. E o `fetch`?
 
 A assinatura do hook no README é:
@@ -41,7 +45,7 @@ A assinatura do hook no README é:
 useRequisicao<T>(buscar: (signal: AbortSignal) => Promise<T>, deps)
 ```
 
-**O hook não sabe — e não deve saber — se existe `fetch`.** Ele só recebe "uma função que aceita um signal e devolve uma Promise". Quem sabe de onde os dados vêm é a camada `api.ts`.
+**O hook não sabe — e não deve saber — se existe** `fetch`**.** Ele só recebe "uma função que aceita um signal e devolve uma Promise". Quem sabe de onde os dados vêm é a camada `api.ts`.
 
 ```
 PainelUsuarios ──► useRequisicao ──► listarUsuarios(params, signal)
@@ -50,7 +54,7 @@ PainelUsuarios ──► useRequisicao ──► listarUsuarios(params, signal)
                                          └─ amanhã: fetch('/api/usuarios?...', { signal })
 ```
 
-Por isso a regra de rejeitar com `name === 'AbortError'`: **é exatamente o que o `fetch` faz** quando o signal é abortado. A API falsa **imita o contrato do `fetch`**. Quando existir backend, você troca só o miolo de `listarUsuarios` — hook e tela não mudam. Isso é separação de responsabilidades.
+Por isso a regra de rejeitar com `name === 'AbortError'`: **é exatamente o que o** `fetch` **faz** quando o signal é abortado. A API falsa **imita o contrato do** `fetch`. Quando existir backend, você troca só o miolo de `listarUsuarios` — hook e tela não mudam. Isso é separação de responsabilidades.
 
 Como ficaria a versão real, no futuro:
 
@@ -60,9 +64,11 @@ if (!resposta.ok) throw new Error(`Erro ${resposta.status}`) // fetch NÃO rejei
 return resposta.json()
 ```
 
-> **Quer `fetch` real já agora?** A ferramenta é o **MSW (Mock Service Worker)**: intercepta o `fetch` no navegador e tem `delay()` para simular latência. Neste projeto, a recomendação é seguir com a função falsa para enxergar cada peça; MSW fica como desafio extra.
+> **Quer** `fetch` **real já agora?** A ferramenta é o **MSW (Mock Service Worker)**: intercepta o `fetch` no navegador e tem `delay()` para simular latência. Neste projeto, a recomendação é seguir com a função falsa para enxergar cada peça; MSW fica como desafio extra.
 
 ---
+
+
 
 ## 3. Anatomia do `listarUsuarios`
 
@@ -86,6 +92,8 @@ export function listarUsuarios(params: ListagemParams, signal?: AbortSignal) {
 ```
 
 ---
+
+
 
 ## 4. De onde vem a busca: o `params`
 
@@ -120,13 +128,15 @@ Não precisa de tratamento especial. Teste no console (F12):
 
 Com `busca = ""`, todos passam no filtro. **A paginação não sabe se houve busca** — ela fatia a lista que receber:
 
-| busca   | depois do filtro | página 1 | `total` | páginas na tela               |
-|---------|------------------|----------|---------|-------------------------------|
-| `""`    | 24               | 5 itens  | 24      | 5                             |
-| `"ana"` | 2+ *             | ...      | ...     | ...                           |
-| `"zzz"` | 0                | `[]`     | 0       | 1 (pelo `Math.max(1, ...)`)   |
 
-\* "Ana" também está dentro de "Mari**ana**" — o `includes` traz mais gente do que parece. Não é bug.
+| busca   | depois do filtro | página 1 | `total` | páginas na tela             |
+| ------- | ---------------- | -------- | ------- | --------------------------- |
+| `""`    | 24               | 5 itens  | 24      | 5                           |
+| `"ana"` | 2+ *             | ...      | ...     | ...                         |
+| `"zzz"` | 0                | `[]`     | 0       | 1 (pelo `Math.max(1, ...)`) |
+
+
+ "Ana" também está dentro de "Mari**ana**" — o `includes` traz mais gente do que parece. Não é bug.
 
 ### Dois cuidados
 
@@ -135,17 +145,23 @@ Com `busca = ""`, todos passam no filtro. **A paginação não sabe se houve bus
 
 ---
 
+
+
 ## 5. Etapa A — filtrar
+
+
 
 ### Como pensar a função
 
 Toda função pequena começa com três perguntas:
 
-| Pergunta          | Resposta                                                   |
-|-------------------|------------------------------------------------------------|
-| O que entra?      | a lista de usuários e o texto da busca                     |
-| O que sai?        | uma lista de usuários (talvez menor)                       |
-| Qual o trabalho?  | manter só quem tem a busca no nome ou no e-mail            |
+
+| Pergunta         | Resposta                                        |
+| ---------------- | ----------------------------------------------- |
+| O que entra?     | a lista de usuários e o texto da busca          |
+| O que sai?       | uma lista de usuários (talvez menor)            |
+| Qual o trabalho? | manter só quem tem a busca no nome ou no e-mail |
+
 
 A assinatura sai direto da tabela:
 
@@ -156,12 +172,16 @@ function filtrar(lista: User[], busca: string): User[] {
 }
 ```
 
+
+
 ### Por que cada decisão
 
 1. **Receber a lista como parâmetro** (em vez de importar lá dentro) deixa a função **pura**: o resultado depende só do que entra, e dá para testar com 3 usuários inventados.
-2. **Receber só `busca: string`**, não o `params` inteiro: peça só o que você usa.
-3. **Normalizar a busca antes do `.filter()`**: o `.filter()` roda uma vez por usuário. Converter a busca lá dentro repete o mesmo trabalho 24 vezes. Faça uma vez e guarde numa constante (`termo`).
-4. **Os campos do usuário também precisam de `.toLowerCase()`**: `"Ana Beatriz".includes("ana")` é `false` por causa do "A" maiúsculo. Os dois lados precisam estar no mesmo formato.
+2. **Receber só** `busca: string`, não o `params` inteiro: peça só o que você usa.
+3. **Normalizar a busca antes do** `.filter()`: o `.filter()` roda uma vez por usuário. Converter a busca lá dentro repete o mesmo trabalho 24 vezes. Faça uma vez e guarde numa constante (`termo`).
+4. **Os campos do usuário também precisam de** `.toLowerCase()`: `"Ana Beatriz".includes("ana")` é `false` por causa do "A" maiúsculo. Os dois lados precisam estar no mesmo formato.
+
+
 
 ### Peças para montar
 
@@ -173,6 +193,8 @@ São 2 linhas de corpo. **Sem ternário** — a busca vazia já funciona sozinha
 
 ---
 
+
+
 ## 6. Etapa B — ordenar
 
 - **Armadilha:** `.sort()` **muta o array original**. Ordenar o array importado direto estraga o "banco" para as próximas chamadas. Trabalhe numa cópia (`[...lista]` ou `.toSorted()`). Repare que o `.filter()` da etapa A já devolve um array novo — pense se isso basta.
@@ -181,6 +203,8 @@ São 2 linhas de corpo. **Sem ternário** — a busca vazia já funciona sozinha
 - Direção: calcule o resultado em `asc` e multiplique por `-1` quando for `desc`.
 
 ---
+
+
 
 ## 7. Etapa C — fatiar
 
@@ -192,6 +216,8 @@ inicio = (pagina - 1) * porPagina
 **Erro comum:** o `total` da resposta é o tamanho **depois do filtro e antes do fatiamento**. Se usar o tamanho da fatia, a paginação mostra sempre "Página 1 de 1".
 
 ---
+
+
 
 ## 8. Etapa D — latência e abort
 
@@ -221,6 +247,8 @@ Dica: `signal.addEventListener('abort', fn, { once: true })`.
 
 ---
 
+
+
 ## 9. Tipos necessários
 
 ```ts
@@ -247,6 +275,8 @@ O retorno é `Promise<Pagina<User>>` — **não** `Pagina<User[]>`, porque `iten
 
 ---
 
+
+
 ## 10. Erros encontrados na primeira versão
 
 Versão revisada:
@@ -265,37 +295,49 @@ function filter(users: User[], search: string): User[] {
 Rastreando `filter(users, "ana")`:
 
 ### `users.includes(normalizeSearch)`
+
 `users` é uma lista de **objetos**. A pergunta feita é "a lista contém a string `"ana"`?" — sempre `false`. O ternário sempre cai em `: users` e **nada é filtrado**. O TypeScript acusa erro aqui (`string` não é `User`). E o ternário nem precisa existir: `"x".includes("")` já resolve a busca vazia.
 
 ### `user.nome || user.email === normalizeSearch`
+
 - **Precedência:** `===` é avaliado antes de `||`. O JS lê `user.nome || (user.email === normalizeSearch)`. Como `user.nome` é uma string não vazia (*truthy*), **todo mundo passa**.
-- **`===` não é "contém":** `user.email === "ana"` só é verdadeiro se o e-mail for exatamente `"ana"`. O certo é `.includes()` **na string do campo**:
+- `===` **não é "contém":** `user.email === "ana"` só é verdadeiro se o e-mail for exatamente `"ana"`. O certo é `.includes()` **na string do campo**:
   ```ts
   user.nome.toLowerCase().includes(termo)
   ```
 - Faltava `.toLowerCase()` nos campos do usuário.
 
+
+
 ### `as string`
+
 `.toLowerCase().trim()` já devolve `string` — o `as` não faz nada. Cuidado com o hábito: `as` **cala** o TypeScript, e quando ele reclama quase sempre está certo.
 
 ### Nomes
+
 - `normalizeSearch` soa como ação (verbo), mas é um valor → `term` / `termo`.
 - O parâmetro `users` tem o mesmo nome do `users` importado (*shadowing*) → use `list` / `lista`.
 - `ListUsers` em PascalCase é convenção de componente/tipo → função comum é camelCase: `listarUsuarios` / `listUsers`.
 
+
+
 ### Outros pontos
 
-| Problema                         | Por quê                                                                                      |
-|----------------------------------|----------------------------------------------------------------------------------------------|
-| `"dsc"`                          | O padrão é `"desc"`. Quando a tela mandar `"desc"`, nada casa.                               |
-| `ordenarPor: string`             | Aceita até `"batata"`. Use a union `CampoOrdenavel`.                                         |
-| `ListParamsProps`                | Sufixo `Props` é para props de **componente**. Aqui é `ListParams`.                          |
-| `signal?` sem tipo               | Vira `any` implícito. O tipo é `AbortSignal`.                                                |
-| `Page<User[]>`                   | `Page` não existe ainda e o certo é `Page<User>`.                                            |
-| Função sem `return`              | O `setTimeout` solto não devolve Promise.                                                    |
-| Dados em `constants/data.tsx`    | Os usuários (o "banco") estão junto das colunas com JSX. Vale separar dados de interface.    |
+
+| Problema                      | Por quê                                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| `"dsc"`                       | O padrão é `"desc"`. Quando a tela mandar `"desc"`, nada casa.                            |
+| `ordenarPor: string`          | Aceita até `"batata"`. Use a union `CampoOrdenavel`.                                      |
+| `ListParamsProps`             | Sufixo `Props` é para props de **componente**. Aqui é `ListParams`.                       |
+| `signal?` sem tipo            | Vira `any` implícito. O tipo é `AbortSignal`.                                             |
+| `Page<User[]>`                | `Page` não existe ainda e o certo é `Page<User>`.                                         |
+| Função sem `return`           | O `setTimeout` solto não devolve Promise.                                                 |
+| Dados em `constants/data.tsx` | Os usuários (o "banco") estão junto das colunas com JSX. Vale separar dados de interface. |
+
 
 ---
+
+
 
 ## 11. Como testar sem tela
 
@@ -319,6 +361,7 @@ c.abort()
 ```
 
 Casos a conferir:
+
 - página 5 com 5 por página → **4** itens (24 usuários);
 - busca `"zzz"` → `itens: []`, `total: 0`;
 - `"ANA"` acha o mesmo que `"ana"`.
@@ -326,6 +369,8 @@ Casos a conferir:
 > Dica: rode os testes do filtro **na versão com bug** antes de corrigir — os três devolvem 24. É assim que se prova que o bug existe.
 
 ---
+
+
 
 ## 12. Checklist
 
