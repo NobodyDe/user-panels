@@ -1,21 +1,24 @@
-import { columns, users } from "../constants/data";
-import { DataTableHeader } from "./DataTableHeader";
-import { MoveVertical } from "lucide-react";
+import { columns } from "../constants/data";
+import { ChevronLeft, ChevronRight, MoveVertical } from "lucide-react";
 import BadgeIcon from "./BadgeIcon";
 import Badge from "./Badge";
 import Active from "./Active";
 import type { User } from "../types/user";
+import type { ListParams, Page } from "../api/api";
 
 type DataTableProps = {
-  users: User[];
+  estado: Page<User>;
+  total: number;
+  params: ListParams;
+  onParamsChange: (mudanca: Partial<ListParams>) => void;
 };
 
-export default function DataTable({ users }: DataTableProps) {
+export default function DataTable({ estado, onParamsChange }: DataTableProps) {
+  const users = estado.itens;
+  const previosButtonDisabled = estado.pagina <= 1;
+  const nextButtonDisabled = estado.pagina >= estado.totalPaginas;
   return (
     <div>
-      <header>
-        <DataTableHeader />
-      </header>
       <div className="rounded-xl border border-border">
         <table className="w-full min-w-[800px] border-collapse  text-left [&_td]:px-4 [&_td]:py-3 [&_th]:px-4 [&_th]:py-3">
           <thead className="rounded-xl">
@@ -35,7 +38,7 @@ export default function DataTable({ users }: DataTableProps) {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {users.map((user: User) => (
               <tr key={user.id} className="bg-superface">
                 <td>
                   <div className="flex gap-2 items-center">
@@ -53,12 +56,43 @@ export default function DataTable({ users }: DataTableProps) {
             ))}
           </tbody>
         </table>
-        <footer className="flex p-4">
+        <footer className="flex p-4 items-center justify-between">
           <div className="flex gap-1">
             <span className="text-text-foreground">Mostrando</span>
-            <span>1-5</span>
+            <span>{`1 - ${estado.porPagina}`}</span>
             <span className="text-text-foreground">de</span>
-            <span>23</span>
+            <span>{estado.total}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              disabled={previosButtonDisabled}
+              onClick={() => onParamsChange({ pagina: estado.pagina - 1 })}
+              className="rounded-lg border border-border flex p-2 bg-button items-center gap-2 px-4 disabled:border-border/20 disabled:bg-button/20 "
+            >
+              <ChevronLeft
+                className={`size-4 ${previosButtonDisabled ? "text-white/10" : ""} `}
+              />
+              <span
+                className={`font-semibold ${previosButtonDisabled ? "text-white/10 " : ""} `}
+              >
+                Anterior
+              </span>
+            </button>
+            <span className="font-semibold text-text-foreground">{`Página ${estado.pagina} de ${estado.totalPaginas}`}</span>
+            <button
+              onClick={() => onParamsChange({ pagina: estado.pagina + 1 })}
+              disabled={nextButtonDisabled}
+              className="rounded-lg border border-border flex p-2 bg-button items-center gap-2 px-4 disabled:border-border/20 disabled:bg-button/20"
+            >
+              <ChevronRight
+                className={`size-4 ${nextButtonDisabled ? "text-white/10" : ""} `}
+              />
+              <span
+                className={`font-semibold ${nextButtonDisabled ? "text-white/10 " : ""} `}
+              >
+                Próxima
+              </span>
+            </button>
           </div>
         </footer>
       </div>

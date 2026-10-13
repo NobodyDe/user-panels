@@ -1,11 +1,12 @@
 import { users } from "../constants/data";
 import type { User } from "../types/user";
 
-type Page<T> = {
+export type Page<T> = {
   itens: T[];
   total: number;
   pagina: number;
   porPagina: number;
+  totalPaginas: number;
 };
 
 export interface ListParams {
@@ -66,12 +67,17 @@ export function ListUsers(params: ListParams, signal?): Promise<Page<User[]>> {
     page: params.pagina,
     perPage: params.porPagina,
   });
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(filtrados.length / params.porPagina),
+  );
 
   const page: Page<User> = {
     itens,
     total: filtrados.length,
     pagina: params.pagina,
     porPagina: params.porPagina,
+    totalPaginas: totalPaginas,
   };
 
   return new Promise((resolve, reject) => {

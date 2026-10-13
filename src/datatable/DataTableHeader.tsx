@@ -1,8 +1,31 @@
 import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export function DataTableHeader() {
+type DataTableHeaderProps = {
+  onSearch: (search: string) => void;
+  buscaAtual: string;
+};
+
+export function DataTableHeader({
+  onSearch,
+  buscaAtual,
+}: DataTableHeaderProps) {
+  const [search, setSearch] = useState<string>("");
+
+  useEffect(() => {
+    const texto = search.trim();
+
+    if (texto === buscaAtual) return;
+
+    const timeoutId = window.setTimeout(() => {
+      onSearch(texto);
+    }, 500);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [search]);
   return (
-    <header className="flex items-center">
+    <header className="flex items-center gap-2">
       <div className="relative w-full max-w-[490px]">
         <Search
           aria-hidden="true"
@@ -10,6 +33,8 @@ export function DataTableHeader() {
         />
         <input
           type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar por nome ou e-mail"
           aria-label="Buscar por nome ou e-mail"
           className="h-10 w-full rounded-lg border border-border bg-superface py-2 pr-3 pl-10"
