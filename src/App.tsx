@@ -21,6 +21,7 @@ function App() {
     [params],
   );
   const estado = useRequisicao(buscarUsuarios);
+  const estadoCarregando = { status: "carregando" };
 
   function changeParams(mudanca: Partial<ListParams>) {
     setParams((anterior) => ({ ...anterior, ...mudanca }));
@@ -39,7 +40,11 @@ function App() {
           />
         </header>
 
-        <DataTable estado={estado} onParamsChange={changeParams} />
+        <DataTable
+          estado={estado}
+          params={params}
+          onParamsChange={changeParams}
+        />
       </div>
     </main>
   );

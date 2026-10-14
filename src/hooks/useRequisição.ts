@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type EstadoRequisicao<T> =
+export type EstadoRequisicao<T> =
   | { status: "carregando" }
   | { status: "sucesso"; dados: T }
   | { status: "erro"; mensagem: string };
@@ -9,7 +9,7 @@ export function useRequisicao<T>(
   buscar: (signal: AbortSignal) => Promise<T>,
 ): EstadoRequisicao<T> {
   const [estado, setEstado] = useState<EstadoRequisicao<T>>({
-    status: "carregando ",
+    status: "carregando",
   });
 
   useEffect(() => {
